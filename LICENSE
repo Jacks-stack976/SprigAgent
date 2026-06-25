@@ -1,0 +1,12 @@
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+Canonical license text: https://creativecommons.org/licenses/by/4.0/legalcode.txt
+Human-readable summary:  https://creativecommons.org/licenses/by/4.0/
+
+TODO: paste full CC BY 4.0 legal text before submission.
+
+The automated fetch of the canonical text was unavailable in this environment
+(curl was denied; WebFetch declined to reproduce the license verbatim). To fill
+this in yourself, run from the SprigAgent root:
+
+    curl -fsSL https://creativecommons.org/licenses/by/4.0/legalcode.txt -o LICENSE
