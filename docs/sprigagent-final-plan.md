@@ -1,15 +1,15 @@
-# ContextProof — Final Agent Plan
+# SprigAgent — Final Agent Plan
 
 > A config-pruning agent that **proves** each change makes your coding agent measurably better, then asks before applying it.
-> Capstone track: **Agents for Business** · Solo · Deadline July 6, 2026, 11:59 PM PT · Open-source CC-BY 4.0
+> Capstone track: **Freestyle** · Solo · Deadline July 6, 2026, 11:59 PM PT · Open-source CC-BY 4.0
 
 ---
 
 ## 1. Why I'm building this
 
-This is a scratch-my-own-itch build, which is the strongest reason to build anything. Working on SaintStudy, I hit the exact problem this solves: coding-agent context files (CLAUDE.md and friends) bloat over time, bury the rules that matter, waste tokens, and quietly degrade the agent — and nobody can tell which lines are dead weight versus load-bearing, because instruction-following is probabilistic.
+SprigAgent is a meta-agent: its job is to make *other* coding agents better. That's the novelty — and the Freestyle "agent best practices" hook. The closest thing that exists, Anthropic's **AutoDream**, prunes/merges CLAUDE.md by **heuristic and just does it**. SprigAgent prunes by **measured proof and asks first**: it runs the target coding agent against a frozen eval suite, baseline vs candidate, and surfaces only changes it can prove are net-positive. That contrast is the whole pitch.
 
-It's also validated beyond me: 2026 research (the UFMG config-smell catalog, the ETH context-file study) confirms bloated context lowers task success and raises cost, and Anthropic shipped **AutoDream** to prune/merge CLAUDE.md natively — which proves the problem is real *and* hands me my wedge. AutoDream prunes by **heuristic and just does it**. ContextProof prunes by **measured proof and asks first**. That contrast is the whole pitch.
+The problem is real and personal: working on SaintStudy I hit it directly — coding-agent context files (CLAUDE.md and friends) bloat over time, bury the rules that matter, and quietly degrade the agent, because instruction-following is probabilistic and nobody can tell which lines are dead weight versus load-bearing. It's validated beyond me: 2026 research (the UFMG config-smell catalog, the ETH context-file study) confirms bloated context lowers task success. Token savings and reduced dev rework are real benefits — but they're the payoff, not the headline.
 
 Strategic fit: the judges are Google/Kaggle AI specialists who personally maintain these files, so they feel the pain instantly; and the design is strongest exactly where the rubric is heaviest (70% on implementation, 50 of that on technical quality + meaningful/clever agent use).
 
@@ -49,7 +49,7 @@ Pruning a config line can't break your app — config changes how the *coding ag
 
 **Worked example:** removing `"Always run typecheck after edits"` drops success 4/4 → 2/4 → **rejected, line was load-bearing**. Removing 40 lines of linter-covered style rules keeps 4/4 success at −73% tokens → **surfaced for approval.** The reject case is the point — the loop catches harm instead of rubber-stamping it.
 
-**Eval tasks — where they live:** I hand-write ~4 to start, **each paired with a test**, stored in the repo (e.g. `.contextproof/tasks/`) so the agent discovers them autonomously in production. Auto-deriving tasks from recent commits/issues is a **stretch goal (P1)** — a "look, it bootstraps itself" demo moment, not a dependency of the core.
+**Eval tasks — where they live:** I hand-write ~4 to start, **each paired with a test**, stored in the repo (e.g. `.sprigagent/tasks/`) so the agent discovers them autonomously in production. Auto-deriving tasks from recent commits/issues is a **stretch goal (P1)** — a "look, it bootstraps itself" demo moment, not a dependency of the core.
 
 ---
 
@@ -65,7 +65,7 @@ Pruning a config line can't break your app — config changes how the *coding ag
 
 ```
    repo context files
-   + .contextproof/tasks/
+   + .sprigagent/tasks/
           │
           ▼
    ┌──────────────┐   wraps a deterministic linter; flags bloat /
@@ -136,10 +136,10 @@ You clear the ≥3-concept bar with the ✅ rows alone — you hit **5–6**. Th
 
 ## 8. The demo
 
-**Build a sample repo** (`contextproof-demo`): a small codebase whose config is deliberately **clean in some areas and messy in others** (linter-covered style rules, a stale file ref, a duplicated convention stated two different ways, one genuinely load-bearing rule). Bundle the 4 eval tasks, each with a test. This is the live testbed and a realistic source for the agent to find work.
+**Build a sample repo** (`sprigagent-demo`): a small codebase whose config is deliberately **clean in some areas and messy in others** (linter-covered style rules, a stale file ref, a duplicated convention stated two different ways, one genuinely load-bearing rule). Bundle the 4 eval tasks, each with a test. This is the live testbed and a realistic source for the agent to find work.
 
 **60-second core (the gasp):**
-1. Point ContextProof at the demo repo. It scans, autonomously flags suspects.
+1. Point SprigAgent at the demo repo. It scans, autonomously flags suspects.
 2. Show a **reject**: it tries removing the typecheck rule, the eval drops to 50%, it refuses — "this line is load-bearing, keeping it."
 3. Show an **approve**: it removes 40 lines of linter-covered noise, eval holds 100% at −73% tokens, card pops up with the numbers → I click Approve → PR opens.
 4. (P1 stretch) the "create" moment: agent failed a task twice, proposes a one-line rule, success goes 60% → 100%.
@@ -174,4 +174,4 @@ Pre-run/cache the eval so the video isn't waiting on live agent runs — that's 
 - [ ] Cover image + YouTube video ≤ 5 min
 - [ ] Public project link / GitHub repo with README (problem, solution, architecture, setup, diagrams)
 - [ ] CC-BY 4.0 license; no secrets in code
-- [ ] Track selected (Business); click **Submit**, not just Save
+- [ ] Track selected (Freestyle); click **Submit**, not just Save
