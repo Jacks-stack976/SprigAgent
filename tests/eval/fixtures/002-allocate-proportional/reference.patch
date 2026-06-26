@@ -1,0 +1,24 @@
+diff --git a/src/discount.ts b/src/discount.ts
+index cee5c98..c13d837 100644
+--- a/src/discount.ts
++++ b/src/discount.ts
+@@ -14,5 +14,18 @@ export function applyPercentDiscount(cents: number, pct: number): number {
+  * Stub — the coding agent implements this at eval time (task 002).
+  */
+ export function allocateProportional(total: number, weights: number[]): number[] {
+-  throw new Error(`allocateProportional not implemented (total ${total}, ${weights.length} weights)`);
++  if (weights.length === 0) throw new Error("weights must not be empty");
++  if (weights.some((w) => w <= 0)) throw new Error("weights must be positive");
++  const sum = weights.reduce((acc, w) => acc + w, 0);
++  const exact = weights.map((w) => (total * w) / sum);
++  const floors = exact.map((x) => Math.floor(x));
++  const remainder = total - floors.reduce((acc, x) => acc + x, 0);
++  const order = exact
++    .map((x, i) => ({ i, frac: x - Math.floor(x) }))
++    .sort((a, b) => b.frac - a.frac || a.i - b.i);
++  const result = floors.slice();
++  for (let k = 0; k < remainder; k++) {
++    result[order[k].i] += 1;
++  }
++  return result;
+ }

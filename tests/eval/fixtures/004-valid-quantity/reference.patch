@@ -1,0 +1,11 @@
+diff --git a/src/validate.ts b/src/validate.ts
+index 4bdfab2..061fd3f 100644
+--- a/src/validate.ts
++++ b/src/validate.ts
+@@ -16,5 +16,5 @@ export function validateLineItem(item: LineItem): void {
+  * Stub — the coding agent implements this at eval time (task 004).
+  */
+ export function isValidQuantity(n: number): boolean {
+-  throw new Error(`isValidQuantity(${n}) not implemented`);
++  return Number.isInteger(n) && n > 0;
+ }

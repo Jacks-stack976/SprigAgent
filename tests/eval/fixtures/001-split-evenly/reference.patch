@@ -1,0 +1,14 @@
+diff --git a/src/invoice.ts b/src/invoice.ts
+index 96ef29d..a012e90 100644
+--- a/src/invoice.ts
++++ b/src/invoice.ts
+@@ -28,5 +28,8 @@ export function invoiceTotal(input: InvoiceInput): number {
+  * Stub — the coding agent implements this at eval time (task 001).
+  */
+ export function splitEvenly(total: number, parts: number): number[] {
+-  throw new Error(`splitEvenly(${total}, ${parts}) not implemented`);
++  if (parts < 1) throw new Error("parts must be at least 1");
++  const base = Math.floor(total / parts);
++  const remainder = total - base * parts;
++  return Array.from({ length: parts }, (_, i) => base + (i < remainder ? 1 : 0));
+ }
