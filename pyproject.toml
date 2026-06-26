@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sprigagent"
+version = "0.0.1"
+description = "Autonomous config-pruning agent that proves each prune is net-positive before a human approves it."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "CC-BY-4.0" }
+dependencies = [
+    # Google ADK — orchestrates the four agents. Runtime model (Vertex Gemini) is
+    # wired in only at the Phase-7 swap point; Phase A runs on a local stub.
+    "google-adk",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+]
+
+[project.scripts]
+sprigagent = "sprigagent.main:main"
+
+# src-layout: the importable package lives under src/, so `python -m sprigagent`
+# resolves after an editable install (`uv pip install -e .`).
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
