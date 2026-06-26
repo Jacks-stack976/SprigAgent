@@ -15,4 +15,7 @@ dist/
 
 # local
 .DS_Store
-.sprig/runs/
+.sprigagent/runs/
+
+# Claude Code plan captures
+.claude/plans/

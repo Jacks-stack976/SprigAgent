@@ -136,7 +136,7 @@ You clear the ≥3-concept bar with the ✅ rows alone — you hit **5–6**. Th
 
 ## 8. The demo
 
-**Build a sample repo** (`sprigagent-demo`): a small codebase whose config is deliberately **clean in some areas and messy in others** (linter-covered style rules, a stale file ref, a duplicated convention stated two different ways, one genuinely load-bearing rule). Bundle the 4 eval tasks, each with a test. This is the live testbed and a realistic source for the agent to find work.
+**Build a sample repo** (`sprig-demo`): a small codebase whose config is deliberately **clean in some areas and messy in others** (linter-covered style rules, a stale file ref, a duplicated convention stated two different ways, one genuinely load-bearing rule). Bundle the 4 eval tasks, each with a test. This is the live testbed and a realistic source for the agent to find work.
 
 **60-second core (the gasp):**
 1. Point SprigAgent at the demo repo. It scans, autonomously flags suspects.

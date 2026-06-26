@@ -2,7 +2,7 @@
 
 ## What this is
 SprigAgent is an autonomous config-pruning agent for the Kaggle/Google "Vibe Coding
-Agents" capstone (Agents for Business track, due 2026-07-06, 11:59 PM PT). It prunes
+Agents" capstone (Freestyle track, due 2026-07-06, 11:59 PM PT). It prunes
 coding-agent context files (CLAUDE.md / GEMINI.md / AGENTS.md) and **proves** each
 prune is net-positive — by running the target coding agent against a frozen eval
 suite, baseline vs candidate — before a human approves it.
