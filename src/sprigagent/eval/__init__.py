@@ -10,10 +10,11 @@ it into the ADK eval_runner agent later is a one-liner.
 """
 
 from sprigagent.eval.candidates import DEMO_CANDIDATES, Candidate, prune
-from sprigagent.eval.driver import AgentDriver, AgentResult, StubDriver
+from sprigagent.eval.driver import AgentDriver, AgentResult, StubDriver, VertexAgentDriver
 from sprigagent.eval.harness import evaluate
+from sprigagent.eval.selection import make_driver_and_counter
 from sprigagent.eval.tasks import Task, load_tasks
-from sprigagent.eval.tokens import CharEstimator, TokenCounter
+from sprigagent.eval.tokens import CharEstimator, GeminiTokenCounter, TokenCounter
 from sprigagent.types import EvalResult, Verdict
 
 __all__ = [
@@ -23,6 +24,8 @@ __all__ = [
     "AgentDriver",
     "AgentResult",
     "StubDriver",
+    "VertexAgentDriver",
+    "make_driver_and_counter",
     "Candidate",
     "prune",
     "DEMO_CANDIDATES",
@@ -30,4 +33,5 @@ __all__ = [
     "load_tasks",
     "TokenCounter",
     "CharEstimator",
+    "GeminiTokenCounter",
 ]

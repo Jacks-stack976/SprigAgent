@@ -13,6 +13,11 @@ dependencies = [
     # Google ADK — orchestrates the four agents. Runtime model (Vertex Gemini) is
     # wired in only at the Phase-7 swap point; Phase A runs on a local stub.
     "google-adk",
+    # google-genai — the unified SDK the Eval-Runner's real Vertex driver and Gemini token
+    # counter call (generate_content / count_tokens). Pulled in transitively by ADK today,
+    # but the eval path imports it directly, so it is declared explicitly. The default
+    # offline path imports it lazily and needs no credentials.
+    "google-genai",
 ]
 
 [project.optional-dependencies]
