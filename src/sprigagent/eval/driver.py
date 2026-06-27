@@ -98,10 +98,12 @@ class StubDriver:
 # the security/parse/diff logic below stays unit-testable — with no SDK and no credentials.
 
 # Bounded output (cost guard): a hard ceiling, not a target. Sized with headroom for a
-# *thinking* model — on Gemini 2.5 the reasoning tokens are billed against this same budget,
-# so a flash-sized 2048 could be exhausted by thinking before any JSON is emitted. An updated
-# src file is tiny (~hundreds of tokens); 8192 keeps the call bounded while leaving room to think.
-MAX_OUTPUT_TOKENS = 8192
+# *thinking* model — on Gemini 2.5 the reasoning tokens are billed against this SAME budget, so
+# the budget must cover thinking + the answer or the JSON truncates mid-string and fails to
+# parse. Measured: a single sprig-demo task spent ~7.9k tokens thinking, so a flash-sized 2048
+# (or even 8192) starved the ~300-800 token answer. 16384 leaves ample room for both while
+# keeping the call bounded; an updated src file itself is only a few hundred tokens.
+MAX_OUTPUT_TOKENS = 16384
 
 # The agent edits exactly one file and returns the whole file, so the harness's `git apply`
 # always applies. Versioned by cache.TEMPLATE_VERSION: editing this text invalidates old

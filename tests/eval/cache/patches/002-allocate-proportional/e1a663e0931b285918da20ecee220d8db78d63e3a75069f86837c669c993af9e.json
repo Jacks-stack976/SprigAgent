@@ -1,0 +1,6 @@
+{
+  "input_tokens": 1922,
+  "model": "gemini-2.5-pro",
+  "output_tokens": 402,
+  "patch": "--- a/src/discount.ts\n+++ b/src/discount.ts\n@@ -10,9 +10,28 @@\n }\n \n /**\n- * Allocate an integer-cent total across positive integer weights.\n- * Stub \u2014 the coding agent implements this at eval time (task 002).\n+ * Allocate an integer-cent total proportionally across a set of positive\n+ * weights. The sum of the returned shares is guaranteed to equal the total.\n  */\n export function allocateProportional(total: number, weights: number[]): number[] {\n-  throw new Error(`allocateProportional not implemented (total ${total}, ${weights.length} weights)`);\n+  if (weights.length === 0) {\n+    throw new Error(\"Cannot allocate to empty weights\");\n+  }\n+  if (weights.some(w => w <= 0)) {\n+    throw new Error(\"Weights must be positive numbers\");\n+  }\n+\n+  const sumOfWeights = weights.reduce((sum, w) => sum + w, 0);\n+  let allocatedSum = 0;\n+  const allocations: number[] = [];\n+\n+  for (let i = 0; i < weights.length - 1; i++) {\n+    const share = roundToCents((total * weights[i]) / sumOfWeights);\n+    allocations.push(share);\n+    allocatedSum += share;\n+  }\n+\n+  allocations.push(total - allocatedSum);\n+\n+  return allocations;\n }\n"
+}

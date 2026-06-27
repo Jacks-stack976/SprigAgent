@@ -1,0 +1,6 @@
+{
+  "input_tokens": 2087,
+  "model": "gemini-2.5-pro",
+  "output_tokens": 348,
+  "patch": "--- a/src/currency.ts\n+++ b/src/currency.ts\n@@ -23,5 +23,8 @@\n  * Stub \u2014 the coding agent implements this at eval time (task 003).\n  */\n export function formatEUR(cents: number): string {\n-  throw new Error(`formatEUR(${cents}) not implemented`);\n+  return new Intl.NumberFormat(\"de-DE\", {\n+    style: \"currency\",\n+    currency: \"EUR\",\n+  }).format(cents / 100);\n }\n"
+}

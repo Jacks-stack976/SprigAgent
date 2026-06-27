@@ -1,0 +1,6 @@
+{
+  "input_tokens": 1859,
+  "model": "gemini-2.5-pro",
+  "output_tokens": 411,
+  "patch": "--- a/src/invoice.ts\n+++ b/src/invoice.ts\n@@ -25,8 +25,16 @@\n \n /**\n  * Split an integer-cent total into `parts` as-equal-as-possible shares.\n- * Stub \u2014 the coding agent implements this at eval time (task 001).\n  */\n export function splitEvenly(total: number, parts: number): number[] {\n-  throw new Error(`splitEvenly(${total}, ${parts}) not implemented`);\n+  if (!Number.isInteger(parts) || parts < 1) {\n+    throw new Error(\"Number of parts must be a positive integer.\");\n+  }\n+\n+  const baseShare = Math.floor(total / parts);\n+  const remainder = total % parts;\n+\n+  return Array.from({ length: parts }, (_, i) => {\n+    return baseShare + (i < remainder ? 1 : 0);\n+  });\n }\n"
+}

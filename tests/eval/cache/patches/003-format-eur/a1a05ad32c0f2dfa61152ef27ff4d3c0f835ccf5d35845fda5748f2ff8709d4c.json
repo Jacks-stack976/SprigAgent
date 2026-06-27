@@ -1,0 +1,6 @@
+{
+  "input_tokens": 1925,
+  "model": "gemini-2.5-pro",
+  "output_tokens": 359,
+  "patch": "--- a/src/currency.ts\n+++ b/src/currency.ts\n@@ -20,8 +20,11 @@\n \n /**\n  * Format an integer-cent amount as euros (de-DE locale).\n- * Stub \u2014 the coding agent implements this at eval time (task 003).\n+ * e.g. `123450` renders as `\"1.234,50 \u20ac\"`\n  */\n export function formatEUR(cents: number): string {\n-  throw new Error(`formatEUR(${cents}) not implemented`);\n+  return new Intl.NumberFormat(\"de-DE\", {\n+    style: \"currency\",\n+    currency: \"EUR\",\n+  }).format(cents / 100);\n }\n"
+}

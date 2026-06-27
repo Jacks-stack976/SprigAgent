@@ -1,0 +1,6 @@
+{
+  "input_tokens": 1889,
+  "model": "gemini-2.5-pro",
+  "output_tokens": 229,
+  "patch": "--- a/src/validate.ts\n+++ b/src/validate.ts\n@@ -16,5 +16,5 @@\n  * Stub \u2014 the coding agent implements this at eval time (task 004).\n  */\n export function isValidQuantity(n: number): boolean {\n-  throw new Error(`isValidQuantity(${n}) not implemented`);\n+  return Number.isInteger(n) && n > 0;\n }\n"
+}
