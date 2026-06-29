@@ -21,7 +21,7 @@ you explicitly turn the real path on.
 python -m sprigagent.eval ~/sprig-demo accept
 
 # Replay: offline, but using the REAL recorded Gemini patches + token counts (no calls).
-SPRIG_DRIVER=replay VERTEX_MODEL=gemini-2.0-flash-001 python -m sprigagent.eval ~/sprig-demo accept
+SPRIG_DRIVER=replay VERTEX_MODEL=gemini-2.5-pro python -m sprigagent.eval ~/sprig-demo accept
 ```
 
 `SPRIG_DRIVER` selects the driver: `stub` (default, offline/free), `vertex` (real Gemini,
@@ -33,7 +33,7 @@ paid), `replay` (offline, replays the committed `tests/eval/cache/`).
 gcloud auth application-default login            # ADC — credentials stay with you, never in the repo
 export GOOGLE_CLOUD_PROJECT=<your-gcp-project>
 export GOOGLE_CLOUD_LOCATION=us-central1
-export VERTEX_MODEL=gemini-2.0-flash-001
+export VERTEX_MODEL=gemini-2.5-pro
 export SPRIG_DRIVER=vertex
 
 # Cost-guarded probe: exactly ONE real call on one task, then apply + grade. Stops here.
