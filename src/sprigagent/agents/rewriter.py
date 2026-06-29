@@ -8,6 +8,12 @@ It is a real LlmAgent (security checkpoint enforced at its model boundary) and s
 Detector's suspect in the conversation history; the stub keys its output off the input
 scenario marker. We deliberately avoid ``{detector_out}`` instruction templating so a
 missing-state edge case can never raise at runtime — the seam is real via history.
+
+Reactive entry points (additive): ``propose()`` / ``gentler()`` are the deterministic, offline
+engine (``sprigagent.rewrite``) — they turn a suspect into the minimal provable edit and the
+strongest→gentlest gentler ladder the Orchestrator re-proves on a reject. Same shape as the
+Detector round's ``discover()``: the stub ``create_rewriter()`` LlmAgent below is left exactly
+as-is (the LLM flip for the Rewriter is a separate, later step).
 """
 
 from __future__ import annotations
@@ -15,6 +21,7 @@ from __future__ import annotations
 from google.adk.agents import Agent
 
 from sprigagent.model.provider import get_model
+from sprigagent.rewrite import gentler, propose  # noqa: F401  (re-exported reactive seams)
 from sprigagent.security.checkpoint import security_before_model_callback
 
 REWRITER_OUTPUT_KEY = "rewriter_out"
