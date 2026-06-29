@@ -78,7 +78,7 @@ class EvalResult:
 
     @property
     def token_delta_pct(self) -> float:
-        """Token change as a percentage; negative = savings (e.g. 4000 -> 1080 == -73.0)."""
+        """Token change as a percentage; negative = savings (e.g. 631 -> 411 == -34.9)."""
         if self.token_before == 0:
             return 0.0
         return round((self.token_after - self.token_before) / self.token_before * 100, 1)

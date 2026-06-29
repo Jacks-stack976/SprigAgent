@@ -28,15 +28,19 @@ EVAL_OUTPUT_KEY = "eval_out"
 # Canned measurements. ACCEPT: quality holds, big token drop -> surface for approval.
 # REJECT: the worked example from the design — removing the typecheck rule halves task
 # success, so the loop refuses. The reject case is the point: the loop catches harm.
+# token_before/token_after are the REAL committed Gemini counts (gemini-2.5-pro, replay cache):
+# 631 -> 411 == -34.9% — replacing the retired stub placeholder figure. The demo (main.py)
+# renders the measured reduction itself; these keep the verdict/delta coherent.
 _ACCEPT = {
     "success_before": 1.0,
     "success_after": 1.0,
-    "token_before": 4000,
-    "token_after": 1080,
+    "token_before": 631,
+    "token_after": 411,
     "verdict": "ACCEPT",
     "evidence": (
-        "4/4 -> 4/4 tasks pass; tokens 4000 -> 1080 (-73%). The style rules were "
-        "redundant with the linter, so removing them held quality and cut cost."
+        "4/4 -> 4/4 tasks pass; the style rules were redundant with the linter, so removing "
+        "them held quality and cut context tokens (measured reduction reported by the demo / "
+        "`python -m sprigagent.eval`)."
     ),
 }
 _REJECT = {

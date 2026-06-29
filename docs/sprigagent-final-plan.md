@@ -47,7 +47,7 @@ Pruning a config line can't break your app — config changes how the *coding ag
 4. **Decide** — accept only if quality holds and cost drops. Else the Rewriter tries a gentler edit and re-runs, or drops it.
 5. **Surface** — proven change → dashboard card with the diff + the numbers.
 
-**Worked example:** removing `"Always run typecheck after edits"` drops success 4/4 → 2/4 → **rejected, line was load-bearing**. Removing 40 lines of linter-covered style rules keeps 4/4 success at −73% tokens → **surfaced for approval.** The reject case is the point — the loop catches harm instead of rubber-stamping it.
+**Worked example:** removing `"Always run typecheck after edits"` drops success 4/4 → 2/4 → **rejected, line was load-bearing**. Removing 40 lines of linter-covered style rules keeps 4/4 success at −34.9% tokens → **surfaced for approval.** The reject case is the point — the loop catches harm instead of rubber-stamping it.
 
 **Eval tasks — where they live:** I hand-write ~4 to start, **each paired with a test**, stored in the repo (e.g. `.sprigagent/tasks/`) so the agent discovers them autonomously in production. Auto-deriving tasks from recent commits/issues is a **stretch goal (P1)** — a "look, it bootstraps itself" demo moment, not a dependency of the core.
 
@@ -90,7 +90,7 @@ Pruning a config line can't break your app — config changes how the *coding ag
           │
           ▼
    ┌──────────────┐   dashboard card: diff + numbers
-   │ Approval UI  │   (100% → 100% success, −73% tokens). Approve / Decline.
+   │ Approval UI  │   (100% → 100% success, −34.9% tokens). Approve / Decline.
    └──────┬───────┘
           │ approved only
           ▼
@@ -141,7 +141,7 @@ You clear the ≥3-concept bar with the ✅ rows alone — you hit **5–6**. Th
 **60-second core (the gasp):**
 1. Point SprigAgent at the demo repo. It scans, autonomously flags suspects.
 2. Show a **reject**: it tries removing the typecheck rule, the eval drops to 50%, it refuses — "this line is load-bearing, keeping it."
-3. Show an **approve**: it removes 40 lines of linter-covered noise, eval holds 100% at −73% tokens, card pops up with the numbers → I click Approve → PR opens.
+3. Show an **approve**: it removes 40 lines of linter-covered noise, eval holds 100% at −34.9% tokens, card pops up with the numbers → I click Approve → PR opens.
 4. (P1 stretch) the "create" moment: agent failed a task twice, proposes a one-line rule, success goes 60% → 100%.
 
 Pre-run/cache the eval so the video isn't waiting on live agent runs — that's the #1 demo risk.
