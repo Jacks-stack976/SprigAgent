@@ -14,6 +14,7 @@ checkpoint is not needed yet; when the LLM-judge fallback lands, it gets the sam
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import AsyncGenerator
 
 from google.adk.agents import BaseAgent
@@ -22,8 +23,12 @@ from google.adk.events import Event, EventActions
 from google.genai import types as genai_types
 
 from sprigagent.agents.rewriter import REWRITER_OUTPUT_KEY
+from sprigagent.eval import DEMO_CANDIDATES, evaluate
 
 EVAL_OUTPUT_KEY = "eval_out"
+# When a real target repo is threaded into session state, the agent proves the scenario through
+# the real frozen harness instead of returning canned numbers (the promised evaluate() wiring).
+TARGET_REPO_KEY = "target_repo"
 
 # Canned measurements. ACCEPT: quality holds, big token drop -> surface for approval.
 # REJECT: the worked example from the design — removing the typecheck rule halves task
@@ -56,6 +61,31 @@ _REJECT = {
 }
 
 
+def _evaluate_real(state, scenario: str) -> dict | None:
+    """Prove ``scenario`` through the real frozen harness when a ``target_repo`` is in state.
+
+    Returns the real ``EvalResult`` serialized to the canned dict's shape, or ``None`` when there is
+    no target repo / unknown scenario / any harness error — in which case the caller falls back to
+    the canned numbers. Offline: ``evaluate`` builds its default StubDriver + chars/4 counter, so
+    this still needs no model, Vertex, or credentials. The in-process demo seeds no ``target_repo``,
+    so it keeps the fast canned path (and ``test_pipeline_smoke.py`` stays green)."""
+    repo = state.get(TARGET_REPO_KEY)
+    if not repo or scenario not in DEMO_CANDIDATES:
+        return None
+    try:
+        result = evaluate(Path(repo), DEMO_CANDIDATES[scenario])
+    except Exception:  # any harness/testbed problem -> fall back to canned, never crash the demo
+        return None
+    return {
+        "success_before": result.success_before,
+        "success_after": result.success_after,
+        "token_before": result.token_before,
+        "token_after": result.token_after,
+        "verdict": result.verdict.value,
+        "evidence": result.evidence,
+    }
+
+
 class EvalRunnerAgent(BaseAgent):
     """Deterministic sandbox stub: candidate scenario -> canned EvalResult."""
 
@@ -71,7 +101,10 @@ class EvalRunnerAgent(BaseAgent):
             except (json.JSONDecodeError, AttributeError, TypeError):
                 scenario = "accept"
 
-        result = _REJECT if scenario == "reject" else _ACCEPT
+        # Real harness when a target_repo is threaded in; canned otherwise (keeps the demo fast).
+        result = _evaluate_real(ctx.session.state, scenario) or (
+            _REJECT if scenario == "reject" else _ACCEPT
+        )
         payload = json.dumps(result)
 
         # Emit the result both as event content and as a state delta (eval_out) so the

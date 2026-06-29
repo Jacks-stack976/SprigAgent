@@ -4,6 +4,13 @@ Real role (later phases): drive the accept / retry / give-up loop and decide whe
 stop. Phase A: a custom ``BaseAgent`` that sequences Detector -> Rewriter -> Eval-Runner
 in a single pass, short-circuits on a security event, and records the decision. The
 retry/give-up loop drops in behind this same interface at Phase 6.
+
+Autonomous entry (additive): ``run_autonomous`` is the real deterministic, offline accept /
+retry / give-up loop (``sprigagent.orchestrate.orchestrate``) — discover suspects, prove the
+strongest prune, ladder gentler on a reject, give up (keep the rule) when exhausted, and
+aggregate into the Approval-UI's ``OrchestrationResult``. Same shape as the Detector/Rewriter
+rounds' ``discover()`` / ``propose()``: the stub ``create_orchestrator()`` ADK agent below is
+left exactly as-is (rewiring the Track-1 LlmAgents to the engines is a separate, later step).
 """
 
 from __future__ import annotations
@@ -18,6 +25,7 @@ from google.genai import types as genai_types
 from sprigagent.agents.detector import DETECTOR_OUTPUT_KEY, create_detector
 from sprigagent.agents.eval_runner import EVAL_OUTPUT_KEY, create_eval_runner
 from sprigagent.agents.rewriter import REWRITER_OUTPUT_KEY, create_rewriter
+from sprigagent.orchestrate import orchestrate as run_autonomous  # noqa: F401  (re-exported engine)
 from sprigagent.security.checkpoint import SECURITY_EVENT_PREFIX
 
 DECISION_KEY = "decision"
