@@ -24,6 +24,12 @@ dependencies = [
 dev = [
     "pytest",
 ]
+# Live GitHub-MCP apply path only (`python -m sprigagent.apply --client mcp`). The official Model
+# Context Protocol SDK is imported lazily, so the core package and the offline test suite never
+# need it; install with `uv pip install -e ".[mcp]"` before opening a PR through MCP.
+mcp = [
+    "mcp",
+]
 
 [project.scripts]
 sprigagent = "sprigagent.main:main"

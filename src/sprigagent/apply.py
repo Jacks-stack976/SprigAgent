@@ -30,6 +30,7 @@ import argparse
 import difflib
 import json
 import re
+import shlex
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -40,6 +41,8 @@ from sprigagent import github_client
 QUARANTINE_DIR = ".sprigagent/quarantine"
 BRANCH_PREFIX = "sprigagent/prune-"
 DEFAULT_BASE = "main"
+# The default GitHub MCP server launch for --client mcp (no Docker; reads its own credentials).
+DEFAULT_MCP_SERVER = "npx -y @modelcontextprotocol/server-github"
 
 
 class ApplyMismatch(Exception):
@@ -283,7 +286,7 @@ def _print_dry_run(plan: BranchPlan, file_text: str) -> None:
     print(plan.quarantine_text)
     print(f"--- PR title ---\n{plan.pr_title}\n")
     print(f"--- PR body ---\n{plan.pr_body}")
-    print("=== end dry run — re-run with --execute to open the PR via gh ===")
+    print("=== end dry run — re-run with --execute (--client gh|mcp) to open the PR ===")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -292,9 +295,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dry-run", action="store_true",
                         help="print the would-be branch/quarantine/PR and make no GitHub call (default)")
     parser.add_argument("--execute", action="store_true",
-                        help="actually open the branch-only PR via gh (opt-in; uses your gh auth)")
+                        help="actually open the branch-only PR (opt-in; uses your own credentials)")
+    parser.add_argument("--client", choices=["gh", "mcp"], default="gh",
+                        help="how to open the PR: gh (default, gh CLI) or mcp (a GitHub MCP server)")
+    parser.add_argument("--mcp-server", default=DEFAULT_MCP_SERVER,
+                        help=f"command launching the GitHub MCP server for --client mcp (default: {DEFAULT_MCP_SERVER!r})")
     parser.add_argument("--base", default=DEFAULT_BASE, help=f"default branch to target (default {DEFAULT_BASE})")
-    parser.add_argument("--repo", default=None, help="owner/name for gh (uses the cwd remote if omitted)")
+    parser.add_argument("--repo", default=None,
+                        help="owner/name (required for --client mcp; gh uses the cwd remote if omitted)")
     args = parser.parse_args(argv)
 
     approved = json.loads(Path(args.approved_json).read_text())
@@ -311,9 +319,23 @@ def main(argv: list[str] | None = None) -> int:
         _print_dry_run(plan, file_text)
         return 0
 
-    client = github_client.GhCliClient(repo=args.repo)
-    url = apply_plan(plan, client)
-    print(f"Opened branch-only PR: {url}")
+    if args.client == "mcp":
+        if not args.repo:
+            print("--client mcp requires --repo owner/name (the GitHub MCP tools need owner+repo).")
+            return 2
+        client = github_client.GithubMcpClient.connect(
+            repo=args.repo, server_command=shlex.split(args.mcp_server))
+        try:
+            url = apply_plan(plan, client)
+        finally:
+            client.close()
+        via = "GitHub MCP"
+    else:
+        client = github_client.GhCliClient(repo=args.repo)
+        url = apply_plan(plan, client)
+        via = "gh CLI"
+
+    print(f"Opened branch-only PR via {via}: {url}")
     print(f"  branch:     {plan.branch} → {plan.base}")
     print(f"  quarantine: {plan.quarantine_path}")
     return 0
