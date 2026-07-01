@@ -1,0 +1,7 @@
+{
+  "id": "003-format-eur",
+  "prompt_file": "task.md",
+  "test_cmd": "npx vitest run --config .sprigagent/vitest.eval.config.ts .sprigagent/tasks/003-format-eur/test.test.ts",
+  "targets_rule": null,
+  "grading": "tests"
+}

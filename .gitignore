@@ -19,5 +19,14 @@ dist/
 .DS_Store
 .sprigagent/runs/
 
+# vendored testbed (testbed/sprig-demo) — Node deps are installed locally via `npm ci`, never
+# committed; the Approval UI also writes runtime artifacts here when run against the bundled copy.
+# (These paths have an internal slash, so they are root-anchored and NOT covered by the rules
+# above; node_modules/ already matches at any depth but is restated for intent.)
+testbed/sprig-demo/node_modules/
+testbed/sprig-demo/.sprigagent/approved.json
+testbed/sprig-demo/.sprigagent/runs/
+
 # Claude Code plan captures
 .claude/plans/
+.claude/

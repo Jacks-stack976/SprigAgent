@@ -19,6 +19,7 @@ which driver they are running.
 
 from __future__ import annotations
 
+import json
 import os
 
 import sprigagent.eval.driver as driver_mod
@@ -71,6 +72,18 @@ def _lazy_vertex_client():
     return get
 
 
+def _cache_model(cache: Cache) -> str | None:
+    """Model id a committed token recording was made under (replay keys must match it).
+
+    Mirrors ``sprigagent.main._cache_model`` so the credential-free replay path can default the
+    model from the committed cache when ``VERTEX_MODEL`` is unset. Imported here rather than from
+    ``main`` to avoid that module's import-time side effects (ADK logging config, pipeline import).
+    """
+    for path in sorted((cache.dir / "tokens").glob("*.json")):
+        return json.loads(path.read_text())["model"]
+    return None
+
+
 def make_driver_and_counter(
     mode: str | None = None, *, cache_dir=None
 ) -> tuple[AgentDriver | None, TokenCounter]:
@@ -85,10 +98,14 @@ def make_driver_and_counter(
         return None, CharEstimator()
 
     if mode == "replay":
-        # Offline: real classes, replay-only cache. Needs only the model id (it is hashed
-        # into the keys), never credentials — a miss raises before any client is built.
-        model = _require(_MODEL)[_MODEL]
+        # Offline: real classes, replay-only cache. Needs only the model id (it is hashed into
+        # the keys), never credentials — a miss raises before any client is built. Default the
+        # model from the committed cache so replay runs with ZERO env vars; an explicit
+        # VERTEX_MODEL still overrides.
         cache = Cache(cache_dir, record=False)
+        model = os.environ.get(_MODEL) or _cache_model(cache)
+        if not model:
+            _require(_MODEL)  # empty cache + no override -> the standard helpful pre-call error
         driver = VertexAgentDriver(model=model, cache=cache)
         counter = GeminiTokenCounter(model=model, cache=cache)
         return driver, counter

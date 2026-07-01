@@ -1,0 +1,10 @@
+{
+  "$comment": "Frozen eval suite. SprigAgent runs the coding agent on each task's prompt (task.md), then runs the paired hidden test (test.test.ts). Pass rate = task success, compared baseline-config vs pruned-config.",
+  "schema": "per-task directories under .sprigagent/tasks/<id>/ each holding task.md, test.test.ts, task.json",
+  "tasks": [
+    "001-split-evenly",
+    "002-allocate-proportional",
+    "003-format-eur",
+    "004-valid-quantity"
+  ]
+}

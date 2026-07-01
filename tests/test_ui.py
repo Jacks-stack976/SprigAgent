@@ -266,12 +266,17 @@ def test_build_returns_result_and_stub_source(monkeypatch):
     assert "StubDriver" in source and "char-estimate" in source
 
 
-def test_replay_without_model_is_friendly_not_a_crash(monkeypatch, capsys):
+def test_replay_without_model_defaults_from_cache(monkeypatch):
     from sprigagent.ui import __main__ as entry
 
     monkeypatch.setenv("SPRIG_DRIVER", "replay")
     monkeypatch.delenv("VERTEX_MODEL", raising=False)
-    # No VERTEX_MODEL under replay -> CredentialsMissing, surfaced friendly, no server, no crash.
-    rc = entry.main(["/any/repo"])
-    assert rc == 2
-    assert "VERTEX_MODEL" in capsys.readouterr().err
+    # Zero-config replay: no VERTEX_MODEL -> the model is defaulted from the committed cache,
+    # so build() succeeds (NOT CredentialsMissing) and the label carries the recorded model.
+    # Stub the loop so this exercises driver selection + attribution without running the suite.
+    fixture = _result([_accepted()])
+    monkeypatch.setattr(entry, "orchestrate", lambda repo, **kw: fixture)
+
+    result, source = entry.build("/any/repo")
+    assert result is fixture
+    assert "gemini-2.5-pro" in source and "replay" in source
