@@ -4,15 +4,15 @@
 
 # SprigAgent
 
-SprigAgent prunes the instruction files your coding agent reads, the rule files like CLAUDE.md, GEMINI.md, and AGENTS.md that build up over time and slow it down. It removes the rules that are no longer necessary, but only after it proves each cut is safe and you approve it.
+SprigAgent prunes the instruction rule files your coding agent reads, like CLAUDE.md, GEMINI.md, and AGENTS.md, that build up over time and slow it down through context rot. It removes the rules that are no longer necessary, but only after it proves each cut is safe and you approve it.
 
-Other tools guess which rules are dead weight and delete them. SprigAgent does not guess. It runs your coding agent with and without each rule inside a sandbox and checks the result against your test suite, the automated checks that already confirm your code works. Nothing changes until you approve it.
+Other tools guess which rules are dead weight and delete them. SprigAgent does not guess. Instead, it runs your coding agent with and without each rule inside a sandbox, and checks the result against your test suite, the automated checks that already confirm your code works. Nothing changes until you approve it.
 
 ---
 
 ## The problem: context rot
 
-Instruction files grow. Rules pile up, repeat each other, and go stale, burying the ones that matter. Because an agent follows instructions by probability rather than by fixed rule, nobody can say for certain which lines are load-bearing and which are dead weight. The file gets longer, the agent gets slower, and its output gets worse. That is context rot.
+Instruction files grow. Rules pile up, repeat each other, and go stale, burying the ones that matter. Because an agent follows instructions by probability rather than by fixed rule, nobody can say for certain which lines are essential and which are dead weight. The file gets longer, the agent gets slower, and its output gets worse. That is context rot.
 
 The research backs this up:
 
@@ -20,7 +20,7 @@ The research backs this up:
 - [Liu et al. at Stanford (2024)](https://arxiv.org/abs/2307.03172) found accuracy falling from roughly 75% to roughly 55% based only on where a fact sat in the context, before the content changed at all.
 - [SWE-Pruner (2026)](https://arxiv.org/abs/2601.16746) found that file-reading alone eats up 76.1% of a coding agent's tokens.
 
-Cutting rules by hand is a gamble. Remove a load-bearing line and the agent quietly gets worse, with no warning. SprigAgent takes the gamble out by proving each cut before you ever see it.
+Cutting rules by hand is a gamble. Remove an essential line and the agent quietly gets worse, with no warning. SprigAgent takes the gamble out by proving each cut is worth making before you act on it.
 
 ---
 
@@ -39,18 +39,18 @@ make demo
 
 You will watch it make two decisions:
 
-- One cut it approves for you to sign off on. Removing a redundant style section keeps the agent at 100% on its tasks while cutting the file by 34.9% (631 tokens down to 411). Click Approve and it stages a pull request on a new branch.
+- One cut it approves for you to sign off on. Removing a redundant style section keeps the agent at 100% on its tasks while cutting the file by 34.9% (631 tokens down to 411). Click Approve to sign off on the cut.
 - One cut it refuses. Removing a money-convention rule that actually matters drops the agent to 3 of 4 tasks passing, so SprigAgent will not let you approve it. That refusal is the whole idea. It will not rubber-stamp a change that makes things worse.
 
 ### Prove it yourself
 
-You do not have to take the demo's word for it. One command proves the headline number straight from the saved recording, with no Node and no cloud:
+You do not have to take the demo's word for it! One command proves the headline number straight from the saved recording, with no Node and no cloud:
 
 ```bash
 pytest tests/eval/test_replay_proof.py
 ```
 
-If that passes, the 34.9% saving is real and it came from a genuine model run, not a figure we typed in. This is the shortest path to confidence: clone, run one test, see the number for yourself.
+If that passes, the 34.9% saving is real and it came from a genuine model run, not a figure we typed in. This is the shortest path to confidence: clone, run one test, see the number for yourself!
 
 ---
 
@@ -58,18 +58,18 @@ If that passes, the 34.9% saving is real and it came from a genuine model run, n
 
 ```mermaid
 flowchart TD
-    A["Instruction file<br/>CLAUDE.md, GEMINI.md, AGENTS.md, .cursorrules"]
-    A --> B["Detector<br/>flags rules that look like dead weight"]
-    B --> C["Rewriter<br/>proposes the smallest cut"]
-    C --> D{"Eval-Runner<br/>runs your tests with and without the cut"}
+    A["Instruction file<br/>CLAUDE.md<br/>GEMINI.md<br/>AGENTS.md<br/>.cursorrules<br/>and more"]
+    A --> B["Detector:<br/>Flags rules that look like dead weight"]
+    B --> C["Rewriter:<br/>Proposes the smallest cut"]
+    C --> D{"Eval-Runner:<br/>Runs your tests with and without the cut"}
     D -->|"work holds, file is smaller"| E["Proven safe"]
     D -->|"work breaks"| F["Try a gentler cut,<br/>or keep the rule"]
     F --> C
-    E --> G["Approval dashboard<br/>you approve or decline"]
-    G --> H["Branch-only pull request<br/>removed lines quarantined, never deleted"]
+    E --> G["Approval dashboard:<br/>You approve or decline"]
+    G --> H["Branch-only pull request:<br/>Removed lines quarantined, never deleted"]
 ```
 
-The engine reads the instruction file and finds a rule to cut. Then it does the part that makes it trustworthy. It copies the file into a sandbox, removes the rule, and runs your tests twice: once with the rule, once without. If the work still passes and the file is smaller, the cut is proven. If the work breaks, it tries a gentler edit; if nothing works, it keeps the rule and moves on. Only proven cuts reach you, and you have the final say.
+SprigAgent reads the instruction file and finds a rule to cut. Then it does the part that makes it trustworthy. It copies the file into a sandbox, removes the rule, and runs your tests twice: once with the rule, once without. If the work still passes and the file is smaller, the cut is proven. If the work breaks, it tries a gentler edit; if nothing works, it keeps the rule and moves on. Only proven cuts reach you, and you have the final say.
 
 Your tests are yours, not something SprigAgent wrote, and that is the point. It can only call a cut safe when something it did not invent agrees. It works on any instruction file, and it always tests the exact file it is cutting from. The one thing you need is a test suite that covers what the file affects.
 
@@ -77,7 +77,7 @@ Your tests are yours, not something SprigAgent wrote, and that is the point. It 
 
 ## Built on Gemini, works with any coding tool
 
-The engine that runs the proof is Gemini 2.5 Pro on Vertex AI, so SprigAgent is Google-native and is not tied to Claude or any single assistant. It prunes instruction files for whatever tool you use (Claude Code, Gemini CLI, Cursor, and others) because it reads the instructions as plain text and does not care about the filename. If you work in Gemini, it runs the same way it does for anyone else.
+The model that runs the proof is Gemini 2.5 Pro on Vertex AI, so SprigAgent is Google-native and is not tied to Claude or any single assistant. It prunes instruction files for whatever tool you use (Claude Code, Gemini CLI, Cursor, and others) because it reads the instructions as plain text and does not care about the filename. If you work in Gemini, it runs the same way it does for anyone else.
 
 ---
 
@@ -103,20 +103,36 @@ Then point it at any instruction file in your repo:
 python -m sprigagent.ui /path/to/your/repo --file CLAUDE.md
 ```
 
-Swap `CLAUDE.md` for `GEMINI.md`, `AGENTS.md`, `.cursorrules`, or any other instruction file. The dashboard opens the same way and shows you the proven cuts to approve or decline.
+Swap `CLAUDE.md` for `GEMINI.md`, `AGENTS.md`, `.cursorrules`, or any other instruction file. The dashboard opens the same way and shows you the proven cuts to approve or decline. To prune more than one file, run the command once for each. Every run also reads your other instruction files, so rules that repeat or clash across them still get caught.
 
-The sample demo runs off a saved recording, so it needs no credentials. Running live against your own code uses Gemini through Vertex AI, so you set the environment variables listed in `.env.example` (your Google Cloud project, location, and model). Your code never leaves your machine except for the model calls, and removed lines are quarantined rather than deleted, so nothing is ever lost.
+### Setting up live use
+
+The demo needs no setup. To run against your own code, there are two one-time steps.
+
+First, connect Gemini. Copy `.env.example` to `.env` and fill in your Google Cloud project, location, and model (`gemini-2.5-pro`). That model is what runs the proof.
+
+Second, connect GitHub, and only if you want the pull request. When you approve a cut, SprigAgent records it, and a separate apply step turns approved cuts into a branch-only pull request. Sign in once with `gh auth login`, then run the apply command the dashboard prints. Without GitHub you can still see and approve cuts, you just apply them yourself.
+
+Your code never leaves your machine except for the model calls, and removed lines are quarantined rather than deleted, so nothing is ever lost.
 
 What it does:
 
 - Prunes any instruction file, for any coding tool, proving each cut against your tests.
-- Handles several instruction files in one repo. It reads the others to catch rules that repeat or contradict across files.
+- Reads all your instruction files together, so it catches rules that repeat or contradict across them.
 - Lands every change on a new branch, never on `main`, and always waits for your approval.
 
 What it will not do:
 
 - Touch your application code. It edits instruction files only, because a rule change is something you can prove by watching the agent, while a code deletion is not.
 - Write your tests. You bring those, and that independence is what makes the proof trustworthy.
+
+---
+
+## Let your coding agent run it
+
+You do not have to run SprigAgent yourself. From inside Claude Code or Gemini CLI, you can ask your agent to tidy your instruction files, and it will run SprigAgent's proof loop for you, so the cuts are still proven and still go through your approval.
+
+This repo ships a `/sprigprune` command. Type `/sprigprune` in Claude Code and it finds your instruction files, runs SprigAgent against your tests, and brings the proven cuts back for you to approve or decline. To use it in your own project, copy `.claude/commands/sprigprune.md` into that project, or into your global `~/.claude/commands/` folder.
 
 ---
 

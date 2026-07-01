@@ -29,4 +29,5 @@ testbed/sprig-demo/.sprigagent/runs/
 
 # Claude Code plan captures
 .claude/plans/
-.claude/
+.claude/*
+!.claude/commands/
