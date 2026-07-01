@@ -64,12 +64,15 @@ def evaluate(
     target_repo: Path,
     candidate: Candidate,
     *,
+    file: str = "CLAUDE.md",
     driver: AgentDriver | None = None,
     counter: TokenCounter = DEFAULT_COUNTER,
     fixtures_dir: Path | None = None,
 ) -> EvalResult:
     """Measure `candidate` against `target_repo` and return an `EvalResult` verdict.
 
+    `file` is the context file being pruned — proof reads and measures THAT file, so detection
+    and proof always agree (default "CLAUDE.md" keeps every existing caller byte-identical).
     `driver` defaults to a StubDriver over `fixtures_dir` (or the repo's bundled fixtures).
     `counter` measures the headline context-file tokens.
     """
@@ -78,7 +81,7 @@ def evaluate(
         driver = StubDriver(fixtures_dir or _default_fixtures_dir(), counter=counter)
 
     tasks = load_tasks(target_repo)
-    full_text = (target_repo / "CLAUDE.md").read_text()
+    full_text = (target_repo / file).read_text()
     pruned_text = prune(full_text, candidate)
 
     before = _run_suite(target_repo, tasks, full_text, driver)

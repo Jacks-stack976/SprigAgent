@@ -71,8 +71,12 @@ def _sweep(target_repo: Path, candidate_key: str) -> int:
     return 0
 
 
-def _smoke(target_repo: Path, task_id: str) -> int:
-    """The single, cost-guarded paid call: one real ``driver.run`` on one task, then grade."""
+def _smoke(target_repo: Path, task_id: str, file: str = "CLAUDE.md") -> int:
+    """The single, cost-guarded paid call: one real ``driver.run`` on one task, then grade.
+
+    ``file`` is the context file fed to the agent — defaults to "CLAUDE.md" so the demo probe is
+    unchanged, but the read is no longer a bare literal (it honors the target file it is given).
+    """
     try:
         # Force the real path regardless of $SPRIG_DRIVER; a missing env is a hard pre-call stop.
         driver, _counter = make_driver_and_counter(mode="vertex")
@@ -88,7 +92,7 @@ def _smoke(target_repo: Path, task_id: str) -> int:
         )
         return 2
     task = tasks[task_id]
-    full_text = (target_repo / "CLAUDE.md").read_text()
+    full_text = (target_repo / file).read_text()
 
     sandbox = make_sandbox(target_repo)
     try:
