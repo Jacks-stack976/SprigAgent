@@ -42,7 +42,3 @@ Developed against the separate `sprig-demo` repo (the prune target) — not this
 
 ## Commands
 _(fill in as the app takes shape: install, run, test, deploy)_
-
-## Reference
-- `docs/vibecoding-agents-capstone-COMPREHENSIVE.md` — full competition rules & rubric
-- `docs/sprigagent-final-plan.md` — locked design (formerly ContextProof, now SprigAgent)

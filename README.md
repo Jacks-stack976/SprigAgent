@@ -44,9 +44,10 @@ You will watch it make two decisions:
 
 ### Prove it yourself
 
-You do not have to take the demo's word for it! One command proves the headline number straight from the saved recording, with no Node and no cloud:
+You do not have to take the demo's word for it! One quick test proves the headline number straight from the saved recording, with no Node and no cloud. Install the test tools, then run it:
 
 ```bash
+pip install -e ".[dev]"
 pytest tests/eval/test_replay_proof.py
 ```
 
@@ -75,9 +76,17 @@ Your tests are yours, not something SprigAgent wrote, and that is the point. It 
 
 ---
 
+## Let your coding agent run it
+
+You do not have to run SprigAgent yourself. From inside your coding agent of choice (Claude, Gemini, Codex, and others), you can ask it to tidy its instruction files, and it will run SprigAgent for you: finding which rules look like dead weight, proving each cut against your tests, and bringing the proven cuts back for you to approve. The cuts are still proven, and you still sign off on every one.
+
+This repo ships a `/sprigprune` command for Claude Code. Type `/sprigprune` and it finds your instruction files, runs SprigAgent against your tests, and shows you the proven cuts to approve or decline. To use it in your own project, copy `.claude/commands/sprigprune.md` into that project, or into your global `~/.claude/commands/` folder.
+
+---
+
 ## Built on Gemini, works with any coding tool
 
-The model that runs the proof is Gemini 2.5 Pro on Vertex AI, so SprigAgent is Google-native and is not tied to Claude or any single assistant. It prunes instruction files for whatever tool you use (Claude Code, Gemini CLI, Cursor, and others) because it reads the instructions as plain text and does not care about the filename. If you work in Gemini, it runs the same way it does for anyone else.
+The model that runs the proof is Gemini 2.5 Pro on Vertex AI, so SprigAgent is Google-native and is not tied to Claude or any single assistant. It prunes any single instruction file you point it at, whatever tool wrote it (Claude Code, Gemini CLI, Cursor, Codex, and others), because it reads the file as plain text and does not care about the name. When your main markdown files sit together, it also reads them side by side to catch rules that repeat or clash across them.
 
 ---
 
@@ -85,7 +94,7 @@ The model that runs the proof is Gemini 2.5 Pro on Vertex AI, so SprigAgent is G
 
 | Concept | Where it lives | What it does |
 |---|---|---|
-| Multi-agent orchestration (Google ADK) | `src/sprigagent/agents/` (`detector.py`, `rewriter.py`, `eval_runner.py`) and `src/sprigagent/orchestrate.py` | Four ADK agents run the find, prove, and decide loop |
+| Multi-agent orchestration (Google ADK) | `src/sprigagent/agents/` (`detector.py`, `rewriter.py`, `eval_runner.py`) and `src/sprigagent/orchestrate.py` | Four ADK agents, Detector, Rewriter, Eval-Runner, and Orchestrator, make up the find, prove, and decide loop |
 | Model Context Protocol (MCP) | `src/sprigagent/github_client.py` (`GithubMcpClient`) and `src/sprigagent/apply.py` (`--client mcp`) | Opens the branch-only pull request over MCP. A `gh` CLI backend is the default, and MCP drops in behind the same interface |
 | Security | `src/sprigagent/security/checkpoint.py` | Scrubs PII and screens for prompt injection before anything reaches the model |
 
@@ -103,7 +112,7 @@ Then point it at any instruction file in your repo:
 python -m sprigagent.ui /path/to/your/repo --file CLAUDE.md
 ```
 
-Swap `CLAUDE.md` for `GEMINI.md`, `AGENTS.md`, `.cursorrules`, or any other instruction file. The dashboard opens the same way and shows you the proven cuts to approve or decline. To prune more than one file, run the command once for each. Every run also reads your other instruction files, so rules that repeat or clash across them still get caught.
+Swap `CLAUDE.md` for `GEMINI.md`, `AGENTS.md`, `.cursorrules`, or any other instruction file. The dashboard opens the same way and shows you the proven cuts to approve or decline. To prune more than one file, run the command once for each. Every run also reads your CLAUDE.md, GEMINI.md, and AGENTS.md together, so rules that repeat or clash across them still get caught.
 
 ### Setting up live use
 
@@ -118,21 +127,13 @@ Your code never leaves your machine except for the model calls, and removed line
 What it does:
 
 - Prunes any instruction file, for any coding tool, proving each cut against your tests.
-- Reads all your instruction files together, so it catches rules that repeat or contradict across them.
+- Reads your CLAUDE.md, GEMINI.md, and AGENTS.md together, so it catches rules that repeat or contradict across them.
 - Lands every change on a new branch, never on `main`, and always waits for your approval.
 
 What it will not do:
 
 - Touch your application code. It edits instruction files only, because a rule change is something you can prove by watching the agent, while a code deletion is not.
 - Write your tests. You bring those, and that independence is what makes the proof trustworthy.
-
----
-
-## Let your coding agent run it
-
-You do not have to run SprigAgent yourself. From inside Claude Code or Gemini CLI, you can ask your agent to tidy your instruction files, and it will run SprigAgent's proof loop for you, so the cuts are still proven and still go through your approval.
-
-This repo ships a `/sprigprune` command. Type `/sprigprune` in Claude Code and it finds your instruction files, runs SprigAgent against your tests, and brings the proven cuts back for you to approve or decline. To use it in your own project, copy `.claude/commands/sprigprune.md` into that project, or into your global `~/.claude/commands/` folder.
 
 ---
 
